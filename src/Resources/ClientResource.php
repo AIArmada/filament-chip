@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace AIArmada\FilamentChip\Resources;
 
 use AIArmada\Chip\Models\Client;
+use AIArmada\CommerceSupport\Support\FilamentPermission;
 use AIArmada\FilamentChip\Resources\ClientResource\Pages\ListClients;
 use AIArmada\FilamentChip\Resources\ClientResource\Pages\ViewClient;
 use AIArmada\FilamentChip\Resources\ClientResource\Schemas\ClientInfolist;
@@ -22,6 +23,7 @@ use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Override;
 
 final class ClientResource extends BaseChipResource
@@ -35,6 +37,21 @@ final class ClientResource extends BaseChipResource
     protected static ?string $pluralModelLabel = 'Clients';
 
     protected static ?string $recordTitleAttribute = 'email';
+
+    public static function canViewAny(): bool
+    {
+        return FilamentPermission::hasAbility('purchase.viewAny');
+    }
+
+    public static function canView(Model $record): bool
+    {
+        return FilamentPermission::hasAbility('purchase.view');
+    }
+
+    public static function shouldRegisterNavigation(): bool
+    {
+        return static::canViewAny();
+    }
 
     #[Override]
     public static function table(Table $table): Table
@@ -87,7 +104,7 @@ final class ClientResource extends BaseChipResource
                             ->icon('heroicon-o-clock'),
                         TextColumn::make('updated_on')
                             ->label('Updated')
-                            ->dateTime(config('filament-chip.tables.created_on_format', 'Y-m-d H:i:s'))
+                            ->dateTime(config('filament-chip.tables.updated_on_format', 'Y-m-d H:i:s'))
                             ->placeholder('—')
                             ->icon('heroicon-o-arrow-path'),
                         TextColumn::make('registration_number')

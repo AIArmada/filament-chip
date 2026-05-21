@@ -40,12 +40,13 @@ final class CreateSendInstruction extends CreateRecord
         $bankAccount = BankAccount::query()
             ->forOwner()
             ->whereKey($data['bank_account_id'] ?? null)
+            ->whereIn('status', ['active', 'approved'])
             ->first();
 
         if ($bankAccount === null) {
             Notification::make()
                 ->title('Invalid bank account')
-                ->body('Selected bank account is not accessible for the current owner.')
+                ->body('Selected bank account must be active or approved for the current owner.')
                 ->danger()
                 ->send();
 
@@ -68,13 +69,13 @@ final class CreateSendInstruction extends CreateRecord
 
             Notification::make()
                 ->title('Payout created successfully')
-                ->body(sprintf('Instruction ID: %s', $instruction->id ?? 'Unknown'))
+                ->body(sprintf('Instruction ID: %s', $instruction->id))
                 ->success()
                 ->send();
 
             return array_merge($data, [
-                'id' => $instruction->id ?? null,
-                'state' => $instruction->state ?? 'queued',
+                'id' => $instruction->id,
+                'state' => $instruction->state,
             ]);
         } catch (Throwable $e) {
             Notification::make()

@@ -6,6 +6,7 @@ namespace AIArmada\FilamentChip\Resources\SendInstructionResource\Tables;
 
 use AIArmada\Chip\Models\SendInstruction;
 use AIArmada\Chip\Services\ChipSendService;
+use AIArmada\CommerceSupport\Support\MoneyFormatter;
 use Filament\Actions\Action;
 use Filament\Actions\ViewAction;
 use Filament\Notifications\Notification;
@@ -49,7 +50,7 @@ final class SendInstructionTable
 
                 TextColumn::make('amount')
                     ->label('Amount')
-                    ->formatStateUsing(fn (?string $state): string => 'MYR ' . number_format((float) ($state ?? 0), 2))
+                    ->formatStateUsing(fn (?string $state): string => MoneyFormatter::formatMajor((float) ($state ?? 0), config('filament-chip.default_currency', 'MYR')))
                     ->weight(FontWeight::SemiBold)
                     ->sortable(),
 
@@ -107,8 +108,19 @@ final class SendInstructionTable
                     ->modalDescription('Are you sure you want to cancel this payout? This action cannot be undone.')
                     ->visible(fn (SendInstruction $record): bool => in_array($record->state, ['received', 'queued'], true))
                     ->action(function (SendInstruction $record): void {
+                        $scopedRecord = self::resolveScopedSendInstruction($record);
+
+                        if ($scopedRecord === null) {
+                            Notification::make()
+                                ->title('Payout is outside your owner scope')
+                                ->danger()
+                                ->send();
+
+                            return;
+                        }
+
                         try {
-                            app(ChipSendService::class)->cancelSendInstruction((string) $record->id);
+                            app(ChipSendService::class)->cancelSendInstruction((string) $scopedRecord->id);
 
                             Notification::make()
                                 ->title('Payout cancelled')
@@ -128,8 +140,19 @@ final class SendInstructionTable
                     ->icon(Heroicon::ArrowPath)
                     ->color('gray')
                     ->action(function (SendInstruction $record): void {
+                        $scopedRecord = self::resolveScopedSendInstruction($record);
+
+                        if ($scopedRecord === null) {
+                            Notification::make()
+                                ->title('Payout is outside your owner scope')
+                                ->danger()
+                                ->send();
+
+                            return;
+                        }
+
                         try {
-                            app(ChipSendService::class)->resendSendInstructionWebhook((string) $record->id);
+                            app(ChipSendService::class)->resendSendInstructionWebhook((string) $scopedRecord->id);
 
                             Notification::make()
                                 ->title('Webhook resent')
@@ -148,5 +171,13 @@ final class SendInstructionTable
             ->defaultSort('created_at', 'desc')
             ->paginated([25, 50, 100])
             ->poll(config('filament-chip.polling_interval', '45s'));
+    }
+
+    private static function resolveScopedSendInstruction(SendInstruction $record): ?SendInstruction
+    {
+        return SendInstruction::query()
+            ->forOwner()
+            ->whereKey($record->getKey())
+            ->first();
     }
 }
