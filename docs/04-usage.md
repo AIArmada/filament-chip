@@ -1,8 +1,10 @@
 ---
-title: Resources
+title: Usage
 ---
 
-# Resources
+# Usage
+
+This guide covers the registered resources and the optional operational surfaces exposed by the plugin.
 
 All resources extend `BaseChipResource` which provides owner scoping, consistent navigation, and shared table/form components.
 
