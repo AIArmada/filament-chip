@@ -70,7 +70,7 @@ Ensure your `.env` has the CHIP API credentials:
 ```env
 # CHIP Collect (Payments)
 CHIP_ENVIRONMENT=sandbox
-CHIP_COLLECT_BRAND_ID=your-brand-uuid
+CHIP_BRAND_ID=your-brand-uuid
 CHIP_COLLECT_API_KEY=your-collect-api-key
 
 # CHIP Send (Payouts) - optional
@@ -84,18 +84,20 @@ CHIP_COLLECT_PUBLIC_KEY="-----BEGIN PUBLIC KEY-----..."
 ## Verify Installation
 
 Navigate to your Filament admin panel. You should see:
-- "CHIP Operations" navigation group with Purchase, Payment, Client, Send Instruction, and Bank Account resources
+- "CHIP Operations" navigation group with Purchase, Client, Payment, SendInstruction, and BankAccount resources
 - Analytics dashboard page
 - CHIP stats widgets (if using dashboard widgets)
 
 ## Optional: Billing Portal
 
-The billing portal is owned by `aiarmada/filament-cashier-chip`, not this package.
-Install it and register its panel provider:
+For customer self-service billing, install `filament-cashier-chip`
+(which pulls in `cashier-chip`):
 
 ```bash
 composer require aiarmada/filament-cashier-chip
 ```
+
+Register the billing panel provider:
 
 ```php
 // bootstrap/providers.php (Laravel 13)
@@ -105,9 +107,7 @@ return [
 ];
 ```
 
-The panel path and identity come from `config/filament-cashier-chip.php`
-(`billing.path`, `billing.panel_id`). Add the `Billable` trait to your billable
-model:
+Add the `Billable` trait to your User model:
 
 ```php
 <?php
@@ -121,10 +121,13 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 class User extends Authenticatable implements BillableContract
 {
     use Billable;
-    
+
     // ...
 }
 ```
+
+See the [filament-cashier-chip installation guide](../../filament-cashier-chip/docs/02-installation.md)
+for portal configuration (`config/filament-cashier-chip.php`).
 
 ## Multi-Panel Setup
 

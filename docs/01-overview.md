@@ -28,10 +28,10 @@ The `aiarmada/filament-chip` package is the Filament admin adapter for `aiarmada
 
 ## Main models services or surfaces
 
-- **Resources** — purchase, client, payment, send-instruction, and bank-account administration
+- **Resources** — purchase, client, payment, payout, and bank-account administration by default
 - **Pages** — analytics dashboard
 - **Widgets** — stats, revenue chart, and recent transactions
-- **Optional surfaces** — the company-statement resource, available when `developerResources()` is enabled
+- **Optional surfaces** — payment, bank account, payout, and statement resources available outside the default registration set
 
 ## Owner scoping and security notes
 
@@ -42,7 +42,7 @@ A Filament admin panel plugin for managing CHIP payment gateway data. Provides e
 
 ## Key Features
 
-- **Essential Resources** - Purchase and Client management (more available optionally)
+- **Essential Resources** - Purchase, Client, Payment, SendInstruction, and BankAccount management (plus CompanyStatement via developer resources)
 - **Analytics Dashboard** - Revenue metrics and transaction insights
 - **Key Widgets** - Revenue charts, stats, recent transactions
 - **Owner Scoping** - Multi-tenancy ready with owner-based isolation
@@ -69,7 +69,7 @@ The plugin registers by default:
 - **1 Page**: `AnalyticsDashboardPage`
 - **3 Widgets**: `ChipStatsWidget`, `RevenueChartWidget`, `RecentTransactionsWidget`
 
-`CompanyStatementResource` and the remaining widgets ship in the package but are not registered by default.
+`CompanyStatementResource` (via `->developerResources()`) and additional widgets are available in the package but not registered by default.
 
 ## Available Resources
 
@@ -80,7 +80,7 @@ The plugin registers by default:
 | `PaymentResource` | ✅ Default | Individual payment records |
 | `BankAccountResource` | ✅ Default | Payout recipient bank accounts |
 | `SendInstructionResource` | ✅ Default | Payout instructions |
-| `CompanyStatementResource` | Optional (`developerResources()`) | Company account statements |
+| `CompanyStatementResource` | Optional | Company account statements (via `->developerResources()`) |
 
 ## Available Pages
 
@@ -97,8 +97,12 @@ The plugin registers by default:
 | `RecentTransactionsWidget` | ✅ Default | Latest purchases table |
 | `AccountBalanceWidget` | Optional | CHIP account balance |
 | `AccountTurnoverWidget` | Optional | Account turnover stats |
+| `BankAccountStatusWidget` | Optional | Bank account verification status |
+| `PaymentMethodsWidget` | Optional | Payment method distribution chart |
+| `PayoutAmountWidget` | Optional | Total payout amounts |
 | `PayoutStatsWidget` | Optional | Payout statistics |
 | `RecentPayoutsWidget` | Optional | Latest payouts table |
+| `TokenStatsWidget` | Optional | Saved token statistics |
 
 ## Requirements
 

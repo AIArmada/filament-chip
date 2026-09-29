@@ -54,50 +54,34 @@ class AnalyticsDashboardPage extends BasePage
 
 Core metrics stats overview:
 
-- Today's Revenue (paid purchases today)
-- This Week (last 7 days)
-- This Month (current month)
-- Success Rate (paid vs failed)
+- Today's Revenue
+- This Week's Revenue
+- This Month's Revenue
+- Success Rate
 
-`ChipStatsWidget` is `final`, so it cannot be subclassed. To add a metric, build your own
-`StatsOverviewWidget` and register it alongside the packaged widget:
+**Customization:**
+
+Package widgets are `final`, so build your own widget for custom metrics:
 
 ```php
 <?php
 
 namespace App\Filament\Widgets;
 
-use AIArmada\Chip\Models\Purchase;
-use AIArmada\CommerceSupport\Support\MoneyFormatter;
-use AIArmada\FilamentChip\Support\PurchaseRevenueExpressions;
-use Filament\Widgets\StatsOverviewWidget;
+use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
-use Illuminate\Support\Facades\DB;
 
-class CustomChipStatsWidget extends StatsOverviewWidget
+class CustomChipStatsWidget extends BaseWidget
 {
     protected function getStats(): array
     {
-        // Totals live in the `purchase` JSON payload, so aggregate through the
-        // driver-aware expression rather than a plain column.
-        $query = Purchase::query()
-            ->whereIn('status', ['paid', 'cleared', 'settled'])
-            ->where('is_test', false);
-
-        $revenueMinor = (int) $query->sum(DB::raw(PurchaseRevenueExpressions::totalMinor($query)));
-
         return [
-            Stat::make('Lifetime Revenue', MoneyFormatter::formatMinor(
-                $revenueMinor,
-                config('filament-chip.default_currency', 'MYR'),
-            ))->icon('heroicon-o-star'),
+            Stat::make('Custom Metric', $this->calculateCustomMetric())
+                ->icon('heroicon-o-star'),
         ];
     }
 }
 ```
-
-`Purchase` carries the `HasOwner` trait, so a query inside an owner context is already
-owner-scoped.
 
 ### RevenueChartWidget
 
@@ -159,15 +143,14 @@ class Dashboard extends BaseDashboard
 
 ## Widget Customization
 
-All packaged widgets are `final`, so set these on your own widget classes rather than by
-extending `ChipStatsWidget` or `RevenueChartWidget`.
-
 ### Column Span
 
 Control widget column span:
 
 ```php
-class MyStatsWidget extends \Filament\Widgets\StatsOverviewWidget
+use Filament\Widgets\StatsOverviewWidget as BaseWidget;
+
+class CustomStatsWidget extends BaseWidget
 {
     protected int|string|array $columnSpan = 'full';
     // Options: 1, 2, 3, 'full', ['md' => 2, 'xl' => 3]
@@ -179,13 +162,10 @@ class MyStatsWidget extends \Filament\Widgets\StatsOverviewWidget
 Control widget display order:
 
 ```php
-class MyStatsWidget extends \Filament\Widgets\StatsOverviewWidget
+use Filament\Widgets\StatsOverviewWidget as BaseWidget;
+
+class CustomStatsWidget extends BaseWidget
 {
     protected static ?int $sort = 1;
-}
-
-class MyChartWidget extends \Filament\Widgets\ChartWidget
-{
-    protected static ?int $sort = 2;
 }
 ```
