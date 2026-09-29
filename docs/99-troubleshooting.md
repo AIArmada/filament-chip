@@ -21,10 +21,12 @@ title: Troubleshooting
 // 1. Verify plugin registration
 $panel->plugin(FilamentChipPlugin::make())
 
-// 2. Check resource toggles (CompanyStatement needs developer resources)
-$panel->plugin(
-    FilamentChipPlugin::make()->developerResources()
-);
+// 2. Check config — resources are not individually switchable.
+//    The only registration switches are the plugin flags:
+//    ->operatorResources(false) and ->developerResources()
+FilamentChipPlugin::make()
+    ->operatorResources()
+    ->developerResources();
 
 // 3. Check resource permissions (if using policies)
 // Ensure canViewAny() returns true
@@ -83,9 +85,9 @@ Purchase::where('status', 'paid')->count();
 The billing portal lives in `aiarmada/filament-cashier-chip`, not here.
 
 **Causes:**
-1. BillingPanelProvider not registered
+1. `AIArmada\FilamentCashierChip\CustomerPortal\BillingPanelProvider` not registered
 2. Wrong path configuration
-3. filament-cashier-chip not installed
+3. `aiarmada/filament-cashier-chip` not installed
 
 **Solutions:**
 
@@ -97,7 +99,7 @@ AIArmada\FilamentCashierChip\CustomerPortal\BillingPanelProvider::class,
 // 2. Clear route cache
 php artisan route:clear
 
-// 3. Check filament-cashier-chip installed
+// 3. Check the portal package is installed
 composer show aiarmada/filament-cashier-chip
 ```
 

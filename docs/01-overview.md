@@ -28,10 +28,10 @@ The `aiarmada/filament-chip` package is the Filament admin adapter for `aiarmada
 
 ## Main models services or surfaces
 
-- **Resources** — purchase, client, payment, payout, and bank-account administration by default
+- **Resources** — purchase, client, payment, send-instruction, and bank-account administration
 - **Pages** — analytics dashboard
 - **Widgets** — stats, revenue chart, and recent transactions
-- **Optional surfaces** — payment, bank account, payout, and statement resources available outside the default registration set
+- **Optional surfaces** — the company-statement resource, available when `developerResources()` is enabled
 
 ## Owner scoping and security notes
 
@@ -69,7 +69,7 @@ The plugin registers by default:
 - **1 Page**: `AnalyticsDashboardPage`
 - **3 Widgets**: `ChipStatsWidget`, `RevenueChartWidget`, `RecentTransactionsWidget`
 
-`CompanyStatementResource` (via `->developerResources()`) and additional widgets are available in the package but not registered by default.
+`CompanyStatementResource` and the remaining widgets ship in the package but are not registered by default.
 
 ## Available Resources
 
@@ -80,7 +80,7 @@ The plugin registers by default:
 | `PaymentResource` | ✅ Default | Individual payment records |
 | `BankAccountResource` | ✅ Default | Payout recipient bank accounts |
 | `SendInstructionResource` | ✅ Default | Payout instructions |
-| `CompanyStatementResource` | Optional | Company account statements (via `->developerResources()`) |
+| `CompanyStatementResource` | Optional (`developerResources()`) | Company account statements |
 
 ## Available Pages
 
